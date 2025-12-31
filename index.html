@@ -1,32 +1,35 @@
 <!doctype html>
-<html>
+<html lang="nl">
 <head>
-  <meta charset="utf-8">
-  <title>Oud & Nieuw Barspel</title>
+  <meta charset="utf-8" />
+  <title>Supabase test</title>
 </head>
 <body>
-  <h1>Scoreboard</h1>
-  <ul id="scores"></ul>
+  <h1>Supabase test</h1>
+  <pre id="output">laden...</pre>
 
   <script type="module">
     import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
 
-    const supabase = createClient(
-      "https://JOUW_PROJECT_ID.supabase.co",
-      "JOUW_ANON_KEY"
-    );
+    const supabaseUrl = "https://ctyykjlvjomaazhuljxn.supabase.co";
+    const supabaseKey = "sb_publishable_Kn_j9ixLtMOT0eHOmcL16w_coqqkRTS"; // jouw key hier
+    const supabase = createClient(supabaseUrl, supabaseKey);
 
-    async function loadScores() {
-      const { data } = await supabase
+    const output = document.getElementById("output");
+
+    async function test() {
+      const { data, error } = await supabase
         .from("players")
-        .select("*")
-        .order("score", { ascending: false });
+        .select("*");
 
-      document.getElementById("scores").innerHTML =
-        data.map(p => `<li>${p.emoji || ""} ${p.name}: ${p.score}</li>`).join("");
+      if (error) {
+        output.textContent = "ERROR:\n" + JSON.stringify(error, null, 2);
+      } else {
+        output.textContent = "SUCCESS:\n" + JSON.stringify(data, null, 2);
+      }
     }
 
-    loadScores();
+    test();
   </script>
 </body>
 </html>
