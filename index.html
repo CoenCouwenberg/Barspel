@@ -201,6 +201,34 @@
       align-items: center;
     }
 
+    .tabs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin: 16px 0 6px;
+    }
+
+    .tab-btn {
+      border: 1px solid #dfd4c4;
+      background: #fff;
+      color: var(--ink);
+      border-radius: 999px;
+      padding: 6px 14px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .tab-btn[aria-pressed="true"] {
+      background: var(--accent);
+      color: #fff;
+      border-color: var(--accent);
+    }
+
+    .tab-panel {
+      display: grid;
+      gap: 16px;
+    }
+
     .muted { color: var(--muted); }
     .small { font-size: 0.95rem; }
 
@@ -222,6 +250,10 @@
     }
 
     .challenge-card {
+      grid-column: 1 / -1;
+    }
+
+    .scoreboard-card {
       grid-column: 1 / -1;
     }
 
@@ -331,6 +363,20 @@
       font-size: 0.8rem;
     }
 
+    .beer-actions {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .beer-count {
+      font-size: 2rem;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+    }
+
     .modal {
       position: fixed;
       inset: 0;
@@ -397,7 +443,7 @@
           <div class="header-actions">
             <div class="countdown-card" aria-label="Countdown tot middernacht">
               <div class="countdown-time" id="countdown">--:--:--</div>
-              <p class="countdown-label">tot middernacht</p>
+              <p class="countdown-label">tot 2026</p>
             </div>
             <button class="secondary-btn" id="switch-player-btn" type="button">Wissel speler</button>
           </div>
@@ -405,59 +451,101 @@
         <p class="small muted">Voltooi de opdracht, keur hem zelf goed en pak je punt.</p>
       </div>
 
-      <div class="grid">
-        <section class="card challenge-card">
-          <h2>Jouw opdracht</h2>
-          <p class="muted small">Kies eerst een level en probeer een nieuwe uitdaging.</p>
-          <div class="level-picker" id="level-picker" role="group" aria-label="Kies level"></div>
-          <div class="challenge-text" id="current-challenge">Nog geen opdracht actief.</div>
-          <div class="actions">
-            <button class="primary-btn" id="approve-btn" type="button">Opdracht gedaan (+1)</button>
-          </div>
-          <div class="status" id="challenge-action-status" aria-live="polite"></div>
-          <div class="status" id="challenge-status" aria-live="polite"></div>
-        </section>
-
-        <section class="card">
-          <h2>Scorebord</h2>
-          <ol class="scoreboard-list" id="scoreboard-list"></ol>
-          <div class="status" id="score-status" aria-live="polite"></div>
-        </section>
-
+      <div class="tabs" role="tablist" aria-label="Schermen">
+        <button class="tab-btn" id="tab-game" type="button" aria-pressed="true">Spel</button>
+        <button class="tab-btn" id="tab-beer" type="button" aria-pressed="false">Bier Scoreboard</button>
       </div>
 
-      <section class="card" id="admin-panel">
-        <div class="header-row">
-          <div>
-            <h2>Adminpaneel</h2>
-            <p class="muted small">Pincode nodig om opdrachten toe te voegen.</p>
-          </div>
-          <div class="header-actions">
-            <button class="secondary-btn" id="unlock-admin-btn" type="button">Ontgrendel</button>
-            <button class="secondary-btn" id="lock-admin-btn" type="button" hidden>Vergrendel</button>
-          </div>
+      <div id="game-tab" class="tab-panel">
+        <div class="grid">
+          <section class="card challenge-card">
+            <h2>Jouw opdracht</h2>
+            <p class="muted small">Kies eerst een level en probeer een nieuwe uitdaging.</p>
+            <div class="level-picker" id="level-picker" role="group" aria-label="Kies level"></div>
+            <div class="challenge-text" id="current-challenge">Nog geen opdracht actief.</div>
+            <div class="actions">
+              <button class="primary-btn" id="approve-btn" type="button">Opdracht gedaan (+1)</button>
+            </div>
+            <div class="status" id="challenge-action-status" aria-live="polite"></div>
+            <div class="status" id="challenge-status" aria-live="polite"></div>
+          </section>
+
+          <section class="card scoreboard-card">
+            <h2>Scorebord</h2>
+            <ol class="scoreboard-list" id="scoreboard-list"></ol>
+            <div class="status" id="score-status" aria-live="polite"></div>
+          </section>
         </div>
 
-        <div id="admin-form" hidden>
-          <label for="challenge-text">Nieuwe opdracht</label>
-          <textarea id="challenge-text" placeholder="Bijv. Doe een mini-toost met iedereen aan de bar."></textarea>
-
-          <div style="height: 12px;"></div>
-
-          <label for="challenge-level">Level</label>
-          <select id="challenge-level">
-            <option value="makkelijk">Makkelijk</option>
-            <option value="gemiddeld">Gemiddeld</option>
-            <option value="extreem">Extreem</option>
-          </select>
-
-          <div class="actions">
-            <button class="primary-btn" id="add-challenge-btn" type="button">Opdracht toevoegen</button>
+        <section class="card" id="admin-panel">
+          <div class="header-row">
+            <div>
+              <h2>Adminpaneel</h2>
+              <p class="muted small">Pincode nodig om opdrachten toe te voegen.</p>
+            </div>
+            <div class="header-actions">
+              <button class="secondary-btn" id="unlock-admin-btn" type="button">Ontgrendel</button>
+              <button class="secondary-btn" id="lock-admin-btn" type="button" hidden>Vergrendel</button>
+            </div>
           </div>
-        </div>
 
-        <div class="status" id="admin-status" aria-live="polite"></div>
-      </section>
+          <div id="admin-form" hidden>
+            <label for="challenge-text">Nieuwe opdracht</label>
+            <textarea id="challenge-text" placeholder="Bijv. Doe een mini-toost met iedereen aan de bar."></textarea>
+
+            <div style="height: 12px;"></div>
+
+            <label for="challenge-level">Level</label>
+            <select id="challenge-level">
+              <option value="makkelijk">Makkelijk</option>
+              <option value="gemiddeld">Gemiddeld</option>
+              <option value="extreem">Extreem</option>
+            </select>
+
+            <div class="actions">
+              <button class="primary-btn" id="add-challenge-btn" type="button">Opdracht toevoegen</button>
+            </div>
+          </div>
+
+          <div class="status" id="admin-status" aria-live="polite"></div>
+        </section>
+      </div>
+
+      <div id="beer-tab" class="tab-panel" hidden>
+        <div class="grid">
+          <section class="card">
+            <h2>Jouw drankjes</h2>
+            <p class="muted small">Tel je drankjes bij voor de actieve speler.</p>
+            <div class="beer-actions">
+              <div>
+                <div class="muted small" id="beer-active-label">Geen speler actief.</div>
+                <div class="beer-count" id="beer-active-count">0</div>
+              </div>
+              <div class="actions">
+                <button class="primary-btn" id="beer-add-btn" type="button">+1 drankje</button>
+                <button class="secondary-btn" id="beer-remove-btn" type="button">-1</button>
+              </div>
+            </div>
+            <div class="status" id="beer-action-status" aria-live="polite"></div>
+          </section>
+
+          <section class="card">
+            <h2>Bier Scoreboard</h2>
+            <p class="muted small">Top 3 krijgen extra punten in het spel.</p>
+            <ol class="scoreboard-list" id="beer-scoreboard-list"></ol>
+            <div class="status" id="beer-status" aria-live="polite"></div>
+          </section>
+
+          <section class="card">
+            <h2>Afsluiten</h2>
+            <p class="muted small">Admin bepaalt wanneer de prijzen worden toegekend.</p>
+            <div class="actions">
+              <button class="secondary-btn" id="beer-award-btn" type="button">Prijzen toekennen</button>
+            </div>
+            <div class="status" id="beer-award-status" aria-live="polite"></div>
+          </section>
+        </div>
+      </div>
     </section>
   </main>
 
@@ -482,7 +570,8 @@
     const supabaseKey = "sb_publishable_Kn_j9ixLtMOT0eHOmcL16w_coqqkRTS";
     const supabase = createClient(supabaseUrl, supabaseKey);
 
-    const ADMIN_PIN = "NY*2026";
+    const ADMIN_PANEL_PIN = "NY*2026";
+    const APPROVE_PIN = "6870";
     const LEVELS = [
       { id: "makkelijk", label: "Makkelijk" },
       { id: "gemiddeld", label: "Gemiddeld" },
@@ -493,6 +582,10 @@
 
     const lobbyScreen = document.getElementById("lobby-screen");
     const mainScreen = document.getElementById("main-screen");
+    const tabGameBtn = document.getElementById("tab-game");
+    const tabBeerBtn = document.getElementById("tab-beer");
+    const gameTab = document.getElementById("game-tab");
+    const beerTab = document.getElementById("beer-tab");
     const playerSelectList = document.getElementById("player-select-list");
     const playerSelectStatus = document.getElementById("player-select-status");
 
@@ -505,6 +598,15 @@
     const approveBtn = document.getElementById("approve-btn");
 
     const levelPicker = document.getElementById("level-picker");
+    const beerActiveLabel = document.getElementById("beer-active-label");
+    const beerActiveCount = document.getElementById("beer-active-count");
+    const beerAddBtn = document.getElementById("beer-add-btn");
+    const beerRemoveBtn = document.getElementById("beer-remove-btn");
+    const beerScoreboardList = document.getElementById("beer-scoreboard-list");
+    const beerStatus = document.getElementById("beer-status");
+    const beerActionStatus = document.getElementById("beer-action-status");
+    const beerAwardBtn = document.getElementById("beer-award-btn");
+    const beerAwardStatus = document.getElementById("beer-award-status");
 
     const unlockAdminBtn = document.getElementById("unlock-admin-btn");
     const lockAdminBtn = document.getElementById("lock-admin-btn");
@@ -529,7 +631,7 @@
     const countdownEl = document.getElementById("countdown");
 
     let selectedEmoji = emojiOptions[0];
-    let selectedLevel = LEVELS[0].id;
+    let selectedLevel = null;
     let activePlayer = null;
     let activeChallenge = null;
     let challengesCache = null;
@@ -539,19 +641,31 @@
     let historyTableAvailable = null;
     const historyCache = new Map();
     let pinResolver = null;
+    let pinExpected = null;
     let adminUnlocked = false;
+    let activeTab = "game";
 
     const STORAGE_KEYS = {
       playerId: "barspel_player_id",
       playerName: "barspel_player_name",
       playerEmoji: "barspel_player_emoji",
       playerLevelPrefix: "barspel_level_",
-      usedPrefix: "barspel_used_"
+      usedPrefix: "barspel_used_",
+      beerAwardedAt: "barspel_beer_awarded_at"
     };
 
     function setStatus(element, message, kind = "") {
       element.textContent = message;
       element.className = `status ${kind}`.trim();
+    }
+
+    function setActiveTab(tab) {
+      activeTab = tab;
+      const isGame = tab === "game";
+      gameTab.hidden = !isGame;
+      beerTab.hidden = isGame;
+      tabGameBtn.setAttribute("aria-pressed", isGame ? "true" : "false");
+      tabBeerBtn.setAttribute("aria-pressed", isGame ? "false" : "true");
     }
 
     function showLobbyScreen() {
@@ -564,7 +678,13 @@
       mainScreen.hidden = false;
       setStatus(challengeActionStatus, "");
       updateWelcomeLine();
+      setActiveTab(activeTab);
       startCountdown();
+      if (!selectedLevel) {
+        setChallengeDisplay("Kies eerst een level.");
+        setStatus(challengeStatus, "");
+        setActionButtonsDisabled(true);
+      }
       refreshData();
       subscribeToRealtime();
     }
@@ -578,12 +698,135 @@
       if (activePlayer) {
         const emoji = activePlayer.emoji ? `${activePlayer.emoji} ` : "";
         const name = activePlayer.name || "Speler";
-        const levelLabel = getLevelLabel(selectedLevel);
+        const levelLabel = selectedLevel ? getLevelLabel(selectedLevel) : "Kies level";
         welcomeLine.textContent = `Actieve speler: ${emoji}${name} • Level: ${levelLabel}`;
         return;
       }
 
       welcomeLine.textContent = "Welkom!";
+    }
+
+    function getBeerCount(player) {
+      return Number(player && player.beer_count) || 0;
+    }
+
+    function updateBeerActiveDisplay() {
+      if (!activePlayer) {
+        beerActiveLabel.textContent = "Geen speler actief.";
+        beerActiveCount.textContent = "0";
+        beerAddBtn.disabled = true;
+        beerRemoveBtn.disabled = true;
+        return;
+      }
+
+      beerActiveLabel.textContent = `Actieve speler: ${formatPlayerLabel(activePlayer)}`;
+      beerActiveCount.textContent = String(getBeerCount(activePlayer));
+      beerAddBtn.disabled = false;
+      beerRemoveBtn.disabled = getBeerCount(activePlayer) === 0;
+    }
+
+    async function updateBeerCount(delta) {
+      if (!activePlayer) {
+        setStatus(beerActionStatus, "Kies eerst een speler.", "error");
+        return;
+      }
+
+      const current = getBeerCount(activePlayer);
+      const next = Math.max(0, current + delta);
+      if (next === current) {
+        setStatus(beerActionStatus, "Aantal is al 0.", "");
+        updateBeerActiveDisplay();
+        return;
+      }
+
+      beerAddBtn.disabled = true;
+      beerRemoveBtn.disabled = true;
+      setStatus(beerActionStatus, "Drankjes bijwerken...");
+
+      const { data, error } = await supabase
+        .from("players")
+        .update({ beer_count: next })
+        .eq("id", activePlayer.id)
+        .select("*")
+        .maybeSingle();
+
+      if (error) {
+        if (isMissingColumn(error, "beer_count")) {
+          setStatus(beerActionStatus, "Kolom beer_count ontbreekt in players.", "error");
+        } else {
+          setStatus(beerActionStatus, `Bijwerken mislukt: ${error.message}`, "error");
+        }
+        updateBeerActiveDisplay();
+        return;
+      }
+
+      activePlayer = data || { ...activePlayer, beer_count: next };
+      updateBeerActiveDisplay();
+      await loadPlayers();
+      setStatus(beerActionStatus, "Drankjes bijgewerkt.", "success");
+    }
+
+    async function awardBeerPrizes() {
+      const approved = await requestPin(ADMIN_PANEL_PIN);
+      if (!approved) {
+        setStatus(beerAwardStatus, "Admin pincode vereist.", "error");
+        return;
+      }
+
+      beerAwardBtn.disabled = true;
+      setStatus(beerAwardStatus, "Prijzen toekennen...");
+
+      const { data, error } = await supabase
+        .from("players")
+        .select("id, name, emoji, score, beer_count")
+        .order("beer_count", { ascending: false })
+        .order("name", { ascending: true });
+
+      if (error) {
+        if (isMissingColumn(error, "beer_count")) {
+          setStatus(beerAwardStatus, "Kolom beer_count ontbreekt in players.", "error");
+        } else {
+          setStatus(beerAwardStatus, `Laden mislukt: ${error.message}`, "error");
+        }
+        beerAwardBtn.disabled = false;
+        return;
+      }
+
+      if (!data || data.length === 0) {
+        setStatus(beerAwardStatus, "Geen spelers gevonden.", "error");
+        beerAwardBtn.disabled = false;
+        return;
+      }
+
+      const winners = data.filter((player) => getBeerCount(player) > 0).slice(0, 3);
+      if (!winners.length) {
+        setStatus(beerAwardStatus, "Nog geen drankjes geteld.", "error");
+        beerAwardBtn.disabled = false;
+        return;
+      }
+
+      const bonuses = [3, 2, 1];
+      const labels = [];
+      for (let i = 0; i < winners.length; i += 1) {
+        const player = winners[i];
+        const bonus = bonuses[i];
+        const nextScore = (Number(player.score) || 0) + bonus;
+        const { error: updateError } = await supabase
+          .from("players")
+          .update({ score: nextScore })
+          .eq("id", player.id);
+
+        if (updateError) {
+          setStatus(beerAwardStatus, `Punten toekennen mislukt: ${updateError.message}`, "error");
+          beerAwardBtn.disabled = false;
+          return;
+        }
+        labels.push(`${formatPlayerLabel(player)} (+${bonus})`);
+      }
+
+      await loadPlayers();
+      setStatus(beerAwardStatus, `Prijzen toegekend: ${labels.join(", ")}.`, "success");
+      beerAwardBtn.disabled = false;
     }
 
     function padTime(value) {
@@ -661,13 +904,14 @@
       if (LEVELS.some((level) => level.id === stored)) {
         return stored;
       }
-      return LEVELS[0].id;
+      return null;
     }
 
     function setSelectedLevel(levelId) {
       selectedLevel = levelId;
       if (activePlayer) {
         localStorage.setItem(`${STORAGE_KEYS.playerLevelPrefix}${activePlayer.id}`, levelId);
+        setLevelCompleted(activePlayer.id, levelId, false);
       }
       renderLevelPicker();
       updateWelcomeLine();
@@ -764,6 +1008,52 @@
       });
     }
 
+    function renderBeerScoreboard(players) {
+      beerScoreboardList.innerHTML = "";
+
+      if (!players || players.length === 0) {
+        const empty = document.createElement("li");
+        empty.className = "scoreboard-empty";
+        empty.textContent = "Nog geen spelers.";
+        beerScoreboardList.appendChild(empty);
+        return;
+      }
+
+      const sorted = [...players].sort((a, b) => {
+        const diff = getBeerCount(b) - getBeerCount(a);
+        if (diff !== 0) {
+          return diff;
+        }
+        const nameA = (a.name || "").toLowerCase();
+        const nameB = (b.name || "").toLowerCase();
+        return nameA.localeCompare(nameB);
+      });
+
+      sorted.forEach((player, index) => {
+        const item = document.createElement("li");
+        item.className = "scoreboard-item";
+
+        if (activePlayer && String(player.id) === String(activePlayer.id)) {
+          item.classList.add("is-me");
+        }
+
+        const rank = document.createElement("span");
+        rank.className = "scoreboard-rank";
+        rank.textContent = `${index + 1}.`;
+
+        const name = document.createElement("span");
+        name.className = "scoreboard-name";
+        name.textContent = formatPlayerLabel(player);
+
+        const count = document.createElement("span");
+        count.className = "scoreboard-score";
+        count.textContent = getBeerCount(player);
+
+        item.append(rank, name, count);
+        beerScoreboardList.appendChild(item);
+      });
+    }
+
     function syncActivePlayer(players) {
       if (!activePlayer) {
         return;
@@ -775,6 +1065,7 @@
         localStorage.setItem(STORAGE_KEYS.playerName, activePlayer.name || "");
         localStorage.setItem(STORAGE_KEYS.playerEmoji, activePlayer.emoji || "");
         updateWelcomeLine();
+        updateBeerActiveDisplay();
         return;
       }
 
@@ -785,6 +1076,7 @@
     async function loadPlayers() {
       setStatus(playerSelectStatus, "Spelers laden...");
       setStatus(scoreStatus, "Scorebord laden...");
+      setStatus(beerStatus, "Bier score laden...");
 
       const { data, error } = await supabase
         .from("players")
@@ -795,26 +1087,41 @@
       if (error) {
         setStatus(playerSelectStatus, "Kan spelers niet laden.", "error");
         setStatus(scoreStatus, "Kan scorebord niet laden.", "error");
+        setStatus(beerStatus, "Kan bier scorebord niet laden.", "error");
         playerSelectList.innerHTML = "";
         scoreboardList.innerHTML = "";
+        beerScoreboardList.innerHTML = "";
         return;
       }
 
       setStatus(playerSelectStatus, "");
       setStatus(scoreStatus, "");
+      setStatus(beerStatus, "");
       renderPlayerSelect(data);
       renderScoreboard(data);
+      renderBeerScoreboard(data);
       syncActivePlayer(data);
+      updateBeerActiveDisplay();
     }
 
     function setActivePlayer(player) {
       activePlayer = player;
+      activeChallenge = null;
       localStorage.setItem(STORAGE_KEYS.playerId, player.id);
       localStorage.setItem(STORAGE_KEYS.playerName, player.name || "");
       localStorage.setItem(STORAGE_KEYS.playerEmoji, player.emoji || "");
       selectedLevel = loadPlayerLevel(player.id);
       renderLevelPicker();
       updateWelcomeLine();
+      updateBeerActiveDisplay();
+      if (!selectedLevel) {
+        setChallengeDisplay("Kies eerst een level.");
+        setStatus(challengeStatus, "");
+        setActionButtonsDisabled(true);
+      } else {
+        setChallengeDisplay("Opdracht laden...");
+        setActionButtonsDisabled(true);
+      }
     }
 
     function clearActivePlayer() {
@@ -823,9 +1130,13 @@
       localStorage.removeItem(STORAGE_KEYS.playerId);
       localStorage.removeItem(STORAGE_KEYS.playerName);
       localStorage.removeItem(STORAGE_KEYS.playerEmoji);
-      selectedLevel = LEVELS[0].id;
+      selectedLevel = null;
       renderLevelPicker();
       updateWelcomeLine();
+      updateBeerActiveDisplay();
+      setChallengeDisplay("Kies eerst een speler.");
+      setStatus(challengeStatus, "");
+      setActionButtonsDisabled(true);
     }
 
     async function selectPlayerById(playerId) {
@@ -885,6 +1196,41 @@
         key,
         JSON.stringify({ id: challenge.id, label: challenge.label, level: challenge.level })
       );
+    }
+
+    function clearLocalChallenge(playerId, levelId) {
+      const key = getChallengeStorageKey(playerId, levelId);
+      if (!key) {
+        return;
+      }
+      localStorage.removeItem(key);
+    }
+
+    function getCompletionKey(playerId, levelId) {
+      if (!playerId || !levelId) {
+        return null;
+      }
+      return `barspel_completed_${playerId}_${levelId}`;
+    }
+
+    function isLevelCompleted(playerId, levelId) {
+      const key = getCompletionKey(playerId, levelId);
+      if (!key) {
+        return false;
+      }
+      return localStorage.getItem(key) === "1";
+    }
+
+    function setLevelCompleted(playerId, levelId, completed) {
+      const key = getCompletionKey(playerId, levelId);
+      if (!key) {
+        return;
+      }
+      if (completed) {
+        localStorage.setItem(key, "1");
+      } else {
+        localStorage.removeItem(key);
+      }
     }
 
     function getLocalUsedIds(playerId) {
@@ -1108,19 +1454,51 @@
       return { ok: true };
     }
 
+    async function clearPlayerChallengeReference() {
+      if (!activePlayer) {
+        return;
+      }
+
+      const { error } = await supabase
+        .from("players")
+        .update({ current_challenge_id: null })
+        .eq("id", activePlayer.id);
+
+      if (error) {
+        if (isMissingColumn(error, "current_challenge_id")) {
+          return;
+        }
+        return;
+      }
+
+      activePlayer = { ...activePlayer, current_challenge_id: null };
+    }
+
     async function ensureActiveChallenge() {
       if (!activePlayer) {
         setChallengeDisplay("Kies eerst een speler.");
+        setActionButtonsDisabled(true);
+        return;
+      }
+
+      if (!selectedLevel) {
+        setChallengeDisplay("Kies eerst een level.");
+        setStatus(challengeStatus, "");
+        setActionButtonsDisabled(true);
+        return;
+      }
+
+      if (isLevelCompleted(activePlayer.id, selectedLevel)) {
+        setChallengeDisplay("Opdracht afgerond. Kies een level voor een nieuwe opdracht.");
+        setStatus(challengeStatus, "");
+        setActionButtonsDisabled(true);
         return;
       }
 
       setStatus(challengeStatus, "Opdracht laden...");
 
       const storedLocal = getLocalChallenge(activePlayer.id, selectedLevel);
-      let storedId = storedLocal ? storedLocal.id : null;
-      if (!storedId && activePlayer.current_challenge_id) {
-        storedId = activePlayer.current_challenge_id;
-      }
+      const storedId = storedLocal ? storedLocal.id : null;
 
       if (storedId) {
         const challenge = await loadChallengeById(storedId);
@@ -1128,7 +1506,7 @@
           const label = pickChallengeLabel(challenge);
           const desiredLevel = normalizeLevel(selectedLevel);
           const challengeLevel = normalizeLevel(challenge.level);
-          const levelOk = !desiredLevel || !challengeLevel || desiredLevel === challengeLevel;
+          const levelOk = !desiredLevel ? true : challengeLevel === desiredLevel;
 
           if (levelOk) {
             const resolvedLevel = challengeLevel || normalizeLevel(selectedLevel);
@@ -1136,6 +1514,7 @@
             setChallengeDisplay(activeChallenge.label);
             setStatus(challengeStatus, "");
             setLocalChallenge(activePlayer.id, selectedLevel, activeChallenge);
+            setActionButtonsDisabled(false);
             return;
           }
         }
@@ -1149,6 +1528,7 @@
         };
         setChallengeDisplay(activeChallenge.label);
         setStatus(challengeStatus, "");
+        setActionButtonsDisabled(false);
         return;
       }
 
@@ -1158,6 +1538,14 @@
     async function assignNewChallenge(excludeId = null) {
       if (!activePlayer) {
         setChallengeDisplay("Kies eerst een speler.");
+        setActionButtonsDisabled(true);
+        return false;
+      }
+
+      if (!selectedLevel) {
+        setChallengeDisplay("Kies eerst een level.");
+        setStatus(challengeStatus, "");
+        setActionButtonsDisabled(true);
         return false;
       }
 
@@ -1166,12 +1554,14 @@
       const { data: challenges, error } = await loadChallenges();
       if (error) {
         setStatus(challengeStatus, "Kan opdrachten niet laden.", "error");
+        setActionButtonsDisabled(true);
         return false;
       }
 
       if (!challenges.length) {
         setChallengeDisplay("Nog geen opdrachten in de database.");
         setStatus(challengeStatus, "Voeg opdrachten toe in Supabase.", "error");
+        setActionButtonsDisabled(true);
         return false;
       }
 
@@ -1179,6 +1569,7 @@
       if (!pool.length) {
         setChallengeDisplay("Geen opdrachten voor dit level.");
         setStatus(challengeStatus, "Kies een ander level of voeg opdrachten toe.", "error");
+        setActionButtonsDisabled(true);
         return false;
       }
 
@@ -1209,6 +1600,7 @@
       if (!candidates.length) {
         setChallengeDisplay("Nog geen opdrachten in de database.");
         setStatus(challengeStatus, "Voeg opdrachten toe in Supabase.", "error");
+        setActionButtonsDisabled(true);
         return false;
       }
 
@@ -1217,6 +1609,7 @@
       const resolvedLevel = normalizeLevel(pick.level) || normalizeLevel(selectedLevel);
       activeChallenge = { id: pick.id, label: label || "Nieuwe opdracht", level: resolvedLevel };
       setChallengeDisplay(activeChallenge.label);
+      setActionButtonsDisabled(false);
 
       const result = await persistPlayerChallenge(activeChallenge);
       if (result.error) {
@@ -1241,7 +1634,8 @@
       approveBtn.disabled = disabled;
     }
 
-    function requestAdminPin() {
+    function requestPin(expectedPin) {
+      pinExpected = expectedPin;
       pinInput.value = "";
       setStatus(pinStatus, "");
       pinModal.hidden = false;
@@ -1254,6 +1648,7 @@
 
     function closePinModal(result) {
       pinModal.hidden = true;
+      pinExpected = null;
       if (pinResolver) {
         pinResolver(result);
         pinResolver = null;
@@ -1262,7 +1657,7 @@
 
     function confirmPin() {
       const value = pinInput.value.trim();
-      if (value === ADMIN_PIN) {
+      if (pinExpected && value === pinExpected) {
         closePinModal(true);
         return;
       }
@@ -1293,17 +1688,14 @@
         return;
       }
 
-      const approved = await requestAdminPin();
+      const approved = await requestPin(APPROVE_PIN);
       if (!approved) {
-        setStatus(challengeActionStatus, "Admin pincode vereist.", "error");
+        setStatus(challengeActionStatus, "Pincode vereist.", "error");
         return;
       }
 
       if (!activeChallenge) {
-        const ok = await assignNewChallenge();
-        if (!ok) {
-          setStatus(challengeActionStatus, "Geen opdracht beschikbaar.", "error");
-        }
+        setStatus(challengeActionStatus, "Geen opdracht actief.", "error");
         return;
       }
 
@@ -1326,10 +1718,16 @@
 
       activePlayer = data || { ...activePlayer, score: nextScore };
       updateWelcomeLine();
+      await loadPlayers();
       await recordChallengeCompletion(activeChallenge);
-      await assignNewChallenge(activeChallenge ? activeChallenge.id : null);
+      setLevelCompleted(activePlayer.id, selectedLevel, true);
+      clearLocalChallenge(activePlayer.id, selectedLevel);
+      await clearPlayerChallengeReference();
+      activeChallenge = null;
+      setChallengeDisplay("Opdracht afgerond. Kies een level voor een nieuwe opdracht.");
+      setStatus(challengeStatus, "");
       setStatus(challengeActionStatus, "Top! Punt erbij.", "success");
-      setActionButtonsDisabled(false);
+      setActionButtonsDisabled(true);
     }
 
     function refreshData() {
@@ -1452,9 +1850,14 @@
 
     approveBtn.addEventListener("click", approveChallenge);
     addChallengeBtn.addEventListener("click", addChallenge);
+    tabGameBtn.addEventListener("click", () => setActiveTab("game"));
+    tabBeerBtn.addEventListener("click", () => setActiveTab("beer"));
+    beerAddBtn.addEventListener("click", () => updateBeerCount(1));
+    beerRemoveBtn.addEventListener("click", () => updateBeerCount(-1));
+    beerAwardBtn.addEventListener("click", awardBeerPrizes);
 
     unlockAdminBtn.addEventListener("click", async () => {
-      const approved = await requestAdminPin();
+      const approved = await requestPin(ADMIN_PANEL_PIN);
       if (!approved) {
         setStatus(adminStatus, "Onjuiste pincode.", "error");
         return;
