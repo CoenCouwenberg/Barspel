@@ -1,12 +1,189 @@
 <!doctype html>
-<html>
+<html lang="nl">
 <head>
   <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Oud & Nieuw Barspel</title>
+  <style>
+    :root {
+      color-scheme: light;
+      font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+      background: #0f172a;
+      color: #f8fafc;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      box-sizing: border-box;
+    }
+
+    main {
+      width: min(720px, 100%);
+      background: #111827;
+      border-radius: 24px;
+      padding: 32px;
+      box-shadow: 0 24px 48px rgba(15, 23, 42, 0.4);
+    }
+
+    h1 {
+      margin-top: 0;
+      font-size: clamp(1.8rem, 2.5vw, 2.4rem);
+    }
+
+    p {
+      line-height: 1.6;
+      color: #e2e8f0;
+    }
+
+    form {
+      display: grid;
+      gap: 16px;
+      margin-top: 24px;
+    }
+
+    label {
+      font-weight: 600;
+    }
+
+    input[type="text"] {
+      padding: 14px 16px;
+      border-radius: 12px;
+      border: 1px solid #334155;
+      background: #0b1120;
+      color: inherit;
+      font-size: 1rem;
+    }
+
+    .emoji-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(56px, 1fr));
+      gap: 12px;
+    }
+
+    .emoji-option {
+      position: relative;
+      border-radius: 14px;
+      border: 2px solid transparent;
+      background: #0b1120;
+      padding: 12px;
+      font-size: 1.6rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: border-color 0.2s ease, transform 0.2s ease;
+    }
+
+    .emoji-option input {
+      position: absolute;
+      opacity: 0;
+      inset: 0;
+      cursor: pointer;
+    }
+
+    .emoji-option:has(input:checked) {
+      border-color: #38bdf8;
+      transform: translateY(-2px);
+    }
+
+    button {
+      border: none;
+      border-radius: 14px;
+      padding: 14px 16px;
+      font-size: 1rem;
+      font-weight: 600;
+      background: #38bdf8;
+      color: #0f172a;
+      cursor: pointer;
+      transition: transform 0.2s ease, opacity 0.2s ease;
+    }
+
+    button:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    .status {
+      min-height: 24px;
+      font-size: 0.95rem;
+    }
+
+    .status.error {
+      color: #fca5a5;
+    }
+
+    .status.success {
+      color: #6ee7b7;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    @media (max-width: 720px) {
+      main {
+        padding: 24px;
+      }
+    }
+  </style>
 </head>
 <body>
-  <h1>Scoreboard</h1>
-  <ul id="scores"></ul>
+  <main>
+    <section id="join-screen">
+      <h1>Doe mee met het Oud & Nieuw Barspel</h1>
+      <p>Vul je naam in en kies een emoji. Daarna sta je meteen in het scorebord.</p>
+
+      <form id="join-form">
+        <div>
+          <label for="player-name">Jouw naam</label>
+          <input id="player-name" name="player-name" type="text" placeholder="Bijv. Sam" required maxlength="40">
+        </div>
+
+        <div>
+          <label>Kies een emoji</label>
+          <div class="emoji-grid" role="radiogroup" aria-label="Emoji keuze">
+            <label class="emoji-option">
+              <input type="radio" name="emoji" value="🥂" required>
+              🥂
+            </label>
+            <label class="emoji-option">
+              <input type="radio" name="emoji" value="🎉">
+              🎉
+            </label>
+            <label class="emoji-option">
+              <input type="radio" name="emoji" value="🍾">
+              🍾
+            </label>
+            <label class="emoji-option">
+              <input type="radio" name="emoji" value="🕺">
+              🕺
+            </label>
+            <label class="emoji-option">
+              <input type="radio" name="emoji" value="💃">
+              💃
+            </label>
+            <label class="emoji-option">
+              <input type="radio" name="emoji" value="🎊">
+              🎊
+            </label>
+          </div>
+        </div>
+
+        <button type="submit" id="join-button">Ik doe mee</button>
+        <div class="status" id="join-status" aria-live="polite"></div>
+      </form>
+    </section>
+
+    <section id="main-screen" class="hidden">
+      <h1>Welkom bij het spel!</h1>
+      <p>Je bent toegevoegd. Laat dit scherm open voor het scorebord en de opdrachten.</p>
+    </section>
+  </main>
 
   <script type="module">
     import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
@@ -16,17 +193,52 @@
       "JOUW_ANON_KEY"
     );
 
-    async function loadScores() {
-      const { data } = await supabase
+    const joinForm = document.getElementById("join-form");
+    const joinButton = document.getElementById("join-button");
+    const joinStatus = document.getElementById("join-status");
+    const joinScreen = document.getElementById("join-screen");
+    const mainScreen = document.getElementById("main-screen");
+
+    const setStatus = (message, type = "") => {
+      joinStatus.textContent = message;
+      joinStatus.className = `status ${type}`.trim();
+    };
+
+    joinForm.addEventListener("submit", async (event) => {
+      event.preventDefault();
+
+      const formData = new FormData(joinForm);
+      const name = formData.get("player-name").trim();
+      const emoji = formData.get("emoji");
+
+      if (!name) {
+        setStatus("Vul eerst je naam in.", "error");
+        return;
+      }
+
+      if (!emoji) {
+        setStatus("Kies een emoji om verder te gaan.", "error");
+        return;
+      }
+
+      joinButton.disabled = true;
+      setStatus("Bezig met toevoegen...", "");
+
+      const { error } = await supabase
         .from("players")
-        .select("*")
-        .order("score", { ascending: false });
+        .insert({ name, emoji, score: 0 });
 
-      document.getElementById("scores").innerHTML =
-        data.map(p => `<li>${p.emoji || ""} ${p.name}: ${p.score}</li>`).join("");
-    }
+      if (error) {
+        console.error(error);
+        setStatus("Er ging iets mis bij het toevoegen. Probeer het opnieuw.", "error");
+        joinButton.disabled = false;
+        return;
+      }
 
-    loadScores();
+      setStatus("Je bent toegevoegd!", "success");
+      joinScreen.classList.add("hidden");
+      mainScreen.classList.remove("hidden");
+    });
   </script>
 </body>
 </html>
