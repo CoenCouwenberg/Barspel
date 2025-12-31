@@ -188,10 +188,9 @@
   <script type="module">
     import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
 
-    const supabase = createClient(
-      "https://JOUW_PROJECT_ID.supabase.co",
-      "JOUW_ANON_KEY"
-    );
+    const supabaseUrl = "https://ctyykjlvjomaazhuljxn.supabase.co";
+    const supabaseKey = "sb_publishable_Kn_j9ixLtMOT0eHOmcL16w_coqqkRTS";
+    const supabase = createClient(supabaseUrl, supabaseKey);
 
     const joinForm = document.getElementById("join-form");
     const joinButton = document.getElementById("join-button");
