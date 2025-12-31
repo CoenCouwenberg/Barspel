@@ -1,35 +1,1493 @@
-<!doctype html>
+﻿<!doctype html>
 <html lang="nl">
 <head>
   <meta charset="utf-8" />
-  <title>Supabase test</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Oud &amp; Nieuw barspel</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #f6f1e8;
+      --card: #fffaf2;
+      --ink: #1b1b1b;
+      --muted: #6b6b6b;
+      --accent: #ff7a59;
+      --ring: #ffd0c2;
+    }
+
+    * { box-sizing: border-box; }
+    [hidden] { display: none !important; }
+    body {
+      margin: 0;
+      font-family: "Trebuchet MS", "Verdana", "Segoe UI", sans-serif;
+      background: radial-gradient(circle at top, #ffe9dc 0%, #f6f1e8 50%, #f1efe8 100%);
+      color: var(--ink);
+      min-height: 100vh;
+    }
+
+    .app {
+      max-width: 780px;
+      margin: 0 auto;
+      padding: 24px 18px 48px;
+    }
+
+    .card {
+      background: var(--card);
+      border-radius: 18px;
+      padding: 20px;
+      box-shadow: 0 18px 50px rgba(55, 45, 25, 0.15);
+      border: 1px solid #eadfce;
+    }
+
+    h1, h2 {
+      margin: 0 0 12px;
+      letter-spacing: 0.3px;
+    }
+
+    p {
+      margin: 0 0 16px;
+      color: var(--muted);
+    }
+
+    label {
+      display: block;
+      font-weight: 600;
+      margin-bottom: 6px;
+    }
+
+    input[type="text"],
+    input[type="password"],
+    textarea,
+    select {
+      width: 100%;
+      padding: 12px 14px;
+      border-radius: 12px;
+      border: 1px solid #dfd4c4;
+      font-size: 1rem;
+      background: #fff;
+      font-family: inherit;
+    }
+
+    input[type="text"]:focus,
+    input[type="password"]:focus,
+    textarea:focus,
+    select:focus {
+      outline: 2px solid var(--ring);
+      border-color: var(--accent);
+    }
+
+    textarea {
+      min-height: 110px;
+      resize: vertical;
+    }
+
+    .emoji-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(54px, 1fr));
+      gap: 10px;
+    }
+
+    .emoji-btn {
+      border: 1px solid #dfd4c4;
+      background: #fff;
+      border-radius: 12px;
+      font-size: 1.4rem;
+      padding: 10px 0;
+      cursor: pointer;
+      transition: transform 0.15s ease, border-color 0.15s ease;
+    }
+
+    .emoji-btn[aria-pressed="true"] {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px var(--ring);
+      transform: translateY(-2px);
+    }
+
+    .actions {
+      margin-top: 18px;
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .primary-btn {
+      flex: 1;
+      min-width: 180px;
+      padding: 12px 16px;
+      border: none;
+      border-radius: 12px;
+      background: var(--accent);
+      color: #fff;
+      font-weight: 700;
+      font-size: 1rem;
+      cursor: pointer;
+    }
+
+    .primary-btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    .secondary-btn {
+      padding: 10px 14px;
+      border-radius: 12px;
+      border: 1px solid #dfd4c4;
+      background: #fff;
+      color: var(--ink);
+      font-weight: 600;
+      font-size: 0.95rem;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+
+    .level-picker {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin: 8px 0 6px;
+    }
+
+    .level-btn {
+      border: 1px solid #dfd4c4;
+      background: #fff;
+      border-radius: 999px;
+      padding: 6px 12px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .level-btn[aria-pressed="true"] {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px var(--ring);
+    }
+
+    .level-btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    .status {
+      margin-top: 14px;
+      font-size: 0.95rem;
+    }
+
+    .status.error { color: #b9402f; }
+    .status.success { color: #1e7f4b; }
+
+    .main-screen {
+      display: grid;
+      gap: 18px;
+      margin-top: 18px;
+    }
+
+    .main-header {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .header-row {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .header-actions {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .muted { color: var(--muted); }
+    .small { font-size: 0.95rem; }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+      gap: 16px;
+    }
+
+    .challenge-text {
+      font-size: 1.7rem;
+      font-weight: 700;
+      min-height: 140px;
+      text-align: center;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 12px 6px;
+    }
+
+    .challenge-card {
+      grid-column: 1 / -1;
+    }
+
+    .scoreboard-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: grid;
+      gap: 10px;
+    }
+
+    .scoreboard-item {
+      display: grid;
+      grid-template-columns: 36px 1fr auto;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 12px;
+      border: 1px solid #e7dbc9;
+      background: #fff;
+      border-radius: 12px;
+    }
+
+    .scoreboard-item.is-me {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px var(--ring);
+    }
+
+    .scoreboard-rank {
+      font-weight: 700;
+      color: var(--muted);
+    }
+
+    .scoreboard-name { font-weight: 600; }
+
+    .scoreboard-score {
+      font-weight: 700;
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: #fff2ea;
+    }
+
+    .scoreboard-empty {
+      color: var(--muted);
+      padding: 10px 4px;
+    }
+
+    .player-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: grid;
+      gap: 10px;
+    }
+
+    .player-row {
+      display: grid;
+      grid-template-columns: 1fr auto auto;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 12px;
+      border: 1px solid #e7dbc9;
+      background: #fff;
+      border-radius: 12px;
+    }
+
+    .player-row.is-active {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px var(--ring);
+    }
+
+    .player-name { font-weight: 600; }
+
+    .player-score-badge {
+      font-weight: 700;
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: #fff2ea;
+    }
+
+    .countdown-time {
+      font-size: 2.2rem;
+      font-weight: 700;
+      letter-spacing: 1px;
+    }
+
+    .countdown-label {
+      margin: 6px 0 0;
+      color: var(--muted);
+    }
+
+    .countdown-card {
+      text-align: right;
+      border: 1px solid #e7dbc9;
+      background: #fff;
+      border-radius: 12px;
+      padding: 8px 12px;
+      min-width: 140px;
+    }
+
+    .countdown-card .countdown-time {
+      font-size: 1.4rem;
+      letter-spacing: 0.5px;
+    }
+
+    .countdown-card .countdown-label {
+      margin-top: 2px;
+      font-size: 0.8rem;
+    }
+
+    .modal {
+      position: fixed;
+      inset: 0;
+      background: rgba(26, 18, 10, 0.55);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 18px;
+      z-index: 20;
+    }
+
+    .modal-card {
+      width: min(420px, 100%);
+      background: var(--card);
+      border-radius: 16px;
+      padding: 20px;
+      border: 1px solid #eadfce;
+      box-shadow: 0 20px 60px rgba(30, 24, 14, 0.25);
+    }
+  </style>
 </head>
 <body>
-  <h1>Supabase test</h1>
-  <pre id="output">laden...</pre>
+  <main class="app">
+    <section id="lobby-screen" class="main-screen">
+      <div class="card main-header">
+        <h1>Oud &amp; Nieuw Amanshof barspel</h1>
+        <p class="muted">Kies een speler of maak een nieuwe speler aan bij de bar.</p>
+      </div>
+
+      <div class="grid">
+        <section class="card" id="player-select-card">
+          <h2>Kies speler</h2>
+          <p class="muted small">Tik op je naam om je challenge te zien.</p>
+          <ol class="player-list" id="player-select-list"></ol>
+          <div class="status" id="player-select-status" aria-live="polite"></div>
+        </section>
+
+        <section class="card" id="join-card">
+          <h2>Nieuwe speler</h2>
+          <label for="player-name">Jouw naam</label>
+          <input id="player-name" type="text" placeholder="Bijv. Sam" maxlength="24" autocomplete="name" />
+
+          <div style="height: 16px;"></div>
+
+          <label>Kies een emoji</label>
+          <div class="emoji-grid" id="emoji-grid" aria-label="Emoji keuzes"></div>
+
+          <div class="actions">
+            <button class="primary-btn" id="join-btn" type="button">Ik doe mee</button>
+          </div>
+
+          <div class="status" id="join-status" aria-live="polite"></div>
+        </section>
+      </div>
+    </section>
+
+    <section id="main-screen" class="main-screen" hidden>
+      <div class="card main-header">
+        <div class="header-row">
+          <div>
+            <h1>Oud &amp; Nieuw barspel</h1>
+            <p id="welcome-line" class="muted">Welkom!</p>
+          </div>
+          <div class="header-actions">
+            <div class="countdown-card" aria-label="Countdown tot middernacht">
+              <div class="countdown-time" id="countdown">--:--:--</div>
+              <p class="countdown-label">tot middernacht</p>
+            </div>
+            <button class="secondary-btn" id="switch-player-btn" type="button">Wissel speler</button>
+          </div>
+        </div>
+        <p class="small muted">Voltooi de opdracht, keur hem zelf goed en pak je punt.</p>
+      </div>
+
+      <div class="grid">
+        <section class="card challenge-card">
+          <h2>Jouw opdracht</h2>
+          <p class="muted small">Kies eerst een level en probeer een nieuwe uitdaging.</p>
+          <div class="level-picker" id="level-picker" role="group" aria-label="Kies level"></div>
+          <div class="challenge-text" id="current-challenge">Nog geen opdracht actief.</div>
+          <div class="actions">
+            <button class="primary-btn" id="approve-btn" type="button">Opdracht gedaan (+1)</button>
+          </div>
+          <div class="status" id="challenge-action-status" aria-live="polite"></div>
+          <div class="status" id="challenge-status" aria-live="polite"></div>
+        </section>
+
+        <section class="card">
+          <h2>Scorebord</h2>
+          <ol class="scoreboard-list" id="scoreboard-list"></ol>
+          <div class="status" id="score-status" aria-live="polite"></div>
+        </section>
+
+      </div>
+
+      <section class="card" id="admin-panel">
+        <div class="header-row">
+          <div>
+            <h2>Adminpaneel</h2>
+            <p class="muted small">Pincode nodig om opdrachten toe te voegen.</p>
+          </div>
+          <div class="header-actions">
+            <button class="secondary-btn" id="unlock-admin-btn" type="button">Ontgrendel</button>
+            <button class="secondary-btn" id="lock-admin-btn" type="button" hidden>Vergrendel</button>
+          </div>
+        </div>
+
+        <div id="admin-form" hidden>
+          <label for="challenge-text">Nieuwe opdracht</label>
+          <textarea id="challenge-text" placeholder="Bijv. Doe een mini-toost met iedereen aan de bar."></textarea>
+
+          <div style="height: 12px;"></div>
+
+          <label for="challenge-level">Level</label>
+          <select id="challenge-level">
+            <option value="makkelijk">Makkelijk</option>
+            <option value="gemiddeld">Gemiddeld</option>
+            <option value="extreem">Extreem</option>
+          </select>
+
+          <div class="actions">
+            <button class="primary-btn" id="add-challenge-btn" type="button">Opdracht toevoegen</button>
+          </div>
+        </div>
+
+        <div class="status" id="admin-status" aria-live="polite"></div>
+      </section>
+    </section>
+  </main>
+
+  <div class="modal" id="pin-modal" hidden>
+    <div class="modal-card">
+      <h2>Admin goedkeuring</h2>
+      <p class="muted small">Voer de pincode in om door te gaan.</p>
+      <label for="pin-input">Pincode</label>
+      <input id="pin-input" type="password" inputmode="text" maxlength="12" autocomplete="one-time-code" />
+      <div class="actions">
+        <button class="secondary-btn" id="pin-cancel" type="button">Annuleren</button>
+        <button class="primary-btn" id="pin-confirm" type="button">Bevestig</button>
+      </div>
+      <div class="status" id="pin-status" aria-live="polite"></div>
+    </div>
+  </div>
 
   <script type="module">
     import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
 
     const supabaseUrl = "https://ctyykjlvjomaazhuljxn.supabase.co";
-    const supabaseKey = "sb_publishable_Kn_j9ixLtMOT0eHOmcL16w_coqqkRTS"; // jouw key hier
+    const supabaseKey = "sb_publishable_Kn_j9ixLtMOT0eHOmcL16w_coqqkRTS";
     const supabase = createClient(supabaseUrl, supabaseKey);
 
-    const output = document.getElementById("output");
+    const ADMIN_PIN = "NY*2026";
+    const LEVELS = [
+      { id: "makkelijk", label: "Makkelijk" },
+      { id: "gemiddeld", label: "Gemiddeld" },
+      { id: "extreem", label: "Extreem" }
+    ];
 
-    async function test() {
-      const { data, error } = await supabase
-        .from("players")
-        .select("*");
+    const emojiOptions = ["🎉", "🥂", "🎯", "🎆", "🪩", "🍾", "🧊", "🎲"];
 
-      if (error) {
-        output.textContent = "ERROR:\n" + JSON.stringify(error, null, 2);
-      } else {
-        output.textContent = "SUCCESS:\n" + JSON.stringify(data, null, 2);
+    const lobbyScreen = document.getElementById("lobby-screen");
+    const mainScreen = document.getElementById("main-screen");
+    const playerSelectList = document.getElementById("player-select-list");
+    const playerSelectStatus = document.getElementById("player-select-status");
+
+    const emojiGrid = document.getElementById("emoji-grid");
+    const nameInput = document.getElementById("player-name");
+    const joinButton = document.getElementById("join-btn");
+    const joinStatus = document.getElementById("join-status");
+
+    const switchPlayerBtn = document.getElementById("switch-player-btn");
+    const approveBtn = document.getElementById("approve-btn");
+
+    const levelPicker = document.getElementById("level-picker");
+
+    const unlockAdminBtn = document.getElementById("unlock-admin-btn");
+    const lockAdminBtn = document.getElementById("lock-admin-btn");
+    const adminForm = document.getElementById("admin-form");
+    const challengeTextInput = document.getElementById("challenge-text");
+    const challengeLevelSelect = document.getElementById("challenge-level");
+    const addChallengeBtn = document.getElementById("add-challenge-btn");
+    const adminStatus = document.getElementById("admin-status");
+
+    const pinModal = document.getElementById("pin-modal");
+    const pinInput = document.getElementById("pin-input");
+    const pinConfirmBtn = document.getElementById("pin-confirm");
+    const pinCancelBtn = document.getElementById("pin-cancel");
+    const pinStatus = document.getElementById("pin-status");
+
+    const welcomeLine = document.getElementById("welcome-line");
+    const challengeEl = document.getElementById("current-challenge");
+    const challengeStatus = document.getElementById("challenge-status");
+    const challengeActionStatus = document.getElementById("challenge-action-status");
+    const scoreboardList = document.getElementById("scoreboard-list");
+    const scoreStatus = document.getElementById("score-status");
+    const countdownEl = document.getElementById("countdown");
+
+    let selectedEmoji = emojiOptions[0];
+    let selectedLevel = LEVELS[0].id;
+    let activePlayer = null;
+    let activeChallenge = null;
+    let challengesCache = null;
+    let challengeTextField = "text";
+    let countdownTimer = null;
+    let realtimeChannel = null;
+    let historyTableAvailable = null;
+    const historyCache = new Map();
+    let pinResolver = null;
+    let adminUnlocked = false;
+
+    const STORAGE_KEYS = {
+      playerId: "barspel_player_id",
+      playerName: "barspel_player_name",
+      playerEmoji: "barspel_player_emoji",
+      playerLevelPrefix: "barspel_level_",
+      usedPrefix: "barspel_used_"
+    };
+
+    function setStatus(element, message, kind = "") {
+      element.textContent = message;
+      element.className = `status ${kind}`.trim();
+    }
+
+    function showLobbyScreen() {
+      lobbyScreen.hidden = false;
+      mainScreen.hidden = true;
+    }
+
+    function showMainScreen() {
+      lobbyScreen.hidden = true;
+      mainScreen.hidden = false;
+      setStatus(challengeActionStatus, "");
+      updateWelcomeLine();
+      startCountdown();
+      refreshData();
+      subscribeToRealtime();
+    }
+
+    function getLevelLabel(levelId) {
+      const match = LEVELS.find((level) => level.id === levelId);
+      return match ? match.label : levelId;
+    }
+
+    function updateWelcomeLine() {
+      if (activePlayer) {
+        const emoji = activePlayer.emoji ? `${activePlayer.emoji} ` : "";
+        const name = activePlayer.name || "Speler";
+        const levelLabel = getLevelLabel(selectedLevel);
+        welcomeLine.textContent = `Actieve speler: ${emoji}${name} • Level: ${levelLabel}`;
+        return;
+      }
+
+      welcomeLine.textContent = "Welkom!";
+    }
+
+    function padTime(value) {
+      return String(value).padStart(2, "0");
+    }
+
+    function getNextMidnight(now = new Date()) {
+      const next = new Date(now);
+      next.setHours(24, 0, 0, 0);
+      return next;
+    }
+
+    function startCountdown() {
+      if (countdownTimer) {
+        return;
+      }
+
+      let target = getNextMidnight();
+      const update = () => {
+        const now = new Date();
+        let diff = target - now;
+        if (diff <= 0) {
+          target = getNextMidnight(now);
+          diff = target - now;
+        }
+
+        const hours = Math.floor(diff / 3600000);
+        const minutes = Math.floor((diff % 3600000) / 60000);
+        const seconds = Math.floor((diff % 60000) / 1000);
+
+        countdownEl.textContent = `${padTime(hours)}:${padTime(minutes)}:${padTime(seconds)}`;
+      };
+
+      update();
+      countdownTimer = setInterval(update, 1000);
+    }
+
+    function renderEmojiButtons() {
+      emojiGrid.innerHTML = "";
+      emojiOptions.forEach((emoji) => {
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = "emoji-btn";
+        btn.textContent = emoji;
+        btn.setAttribute("aria-pressed", emoji === selectedEmoji ? "true" : "false");
+        btn.addEventListener("click", () => {
+          selectedEmoji = emoji;
+          renderEmojiButtons();
+        });
+        emojiGrid.appendChild(btn);
+      });
+    }
+
+    function renderLevelPicker() {
+      levelPicker.innerHTML = "";
+      LEVELS.forEach((level) => {
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = "level-btn";
+        btn.textContent = level.label;
+        btn.setAttribute("aria-pressed", level.id === selectedLevel ? "true" : "false");
+        btn.disabled = !activePlayer;
+        btn.addEventListener("click", () => {
+          if (!activePlayer) {
+            return;
+          }
+          setSelectedLevel(level.id);
+        });
+        levelPicker.appendChild(btn);
+      });
+    }
+
+    function loadPlayerLevel(playerId) {
+      const stored = localStorage.getItem(`${STORAGE_KEYS.playerLevelPrefix}${playerId}`);
+      if (LEVELS.some((level) => level.id === stored)) {
+        return stored;
+      }
+      return LEVELS[0].id;
+    }
+
+    function setSelectedLevel(levelId) {
+      selectedLevel = levelId;
+      if (activePlayer) {
+        localStorage.setItem(`${STORAGE_KEYS.playerLevelPrefix}${activePlayer.id}`, levelId);
+      }
+      renderLevelPicker();
+      updateWelcomeLine();
+      if (activePlayer) {
+        activeChallenge = null;
+        setStatus(challengeActionStatus, "");
+        ensureActiveChallenge();
       }
     }
 
-    test();
+    function formatPlayerLabel(player) {
+      const emoji = player.emoji ? `${player.emoji} ` : "";
+      const name = player.name || "Onbekend";
+      return `${emoji}${name}`;
+    }
+
+    function renderPlayerSelect(players) {
+      playerSelectList.innerHTML = "";
+
+      if (!players || players.length === 0) {
+        const empty = document.createElement("li");
+        empty.className = "scoreboard-empty";
+        empty.textContent = "Nog geen spelers. Maak er eentje aan.";
+        playerSelectList.appendChild(empty);
+        return;
+      }
+
+      players.forEach((player) => {
+        const item = document.createElement("li");
+        item.className = "player-row";
+
+        const isActive = activePlayer && String(activePlayer.id) === String(player.id);
+        if (isActive) {
+          item.classList.add("is-active");
+        }
+
+        const name = document.createElement("span");
+        name.className = "player-name";
+        name.textContent = formatPlayerLabel(player);
+
+        const score = document.createElement("span");
+        score.className = "player-score-badge";
+        const scoreValue = Number.isFinite(player.score) ? player.score : Number(player.score) || 0;
+        score.textContent = scoreValue;
+
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = "secondary-btn";
+        button.textContent = isActive ? "Geselecteerd" : "Speel";
+        button.disabled = isActive;
+        button.addEventListener("click", () => {
+          selectPlayerById(player.id);
+        });
+
+        item.append(name, score, button);
+        playerSelectList.appendChild(item);
+      });
+    }
+
+    function renderScoreboard(players) {
+      scoreboardList.innerHTML = "";
+
+      if (!players || players.length === 0) {
+        const empty = document.createElement("li");
+        empty.className = "scoreboard-empty";
+        empty.textContent = "Nog geen spelers.";
+        scoreboardList.appendChild(empty);
+        return;
+      }
+
+      players.forEach((player, index) => {
+        const item = document.createElement("li");
+        item.className = "scoreboard-item";
+
+        if (activePlayer && String(player.id) === String(activePlayer.id)) {
+          item.classList.add("is-me");
+        }
+
+        const rank = document.createElement("span");
+        rank.className = "scoreboard-rank";
+        rank.textContent = `${index + 1}.`;
+
+        const name = document.createElement("span");
+        name.className = "scoreboard-name";
+        name.textContent = formatPlayerLabel(player);
+
+        const score = document.createElement("span");
+        score.className = "scoreboard-score";
+        const scoreValue = Number.isFinite(player.score) ? player.score : Number(player.score) || 0;
+        score.textContent = scoreValue;
+
+        item.append(rank, name, score);
+        scoreboardList.appendChild(item);
+      });
+    }
+
+    function syncActivePlayer(players) {
+      if (!activePlayer) {
+        return;
+      }
+
+      const match = players.find((player) => String(player.id) === String(activePlayer.id));
+      if (match) {
+        activePlayer = { ...activePlayer, ...match };
+        localStorage.setItem(STORAGE_KEYS.playerName, activePlayer.name || "");
+        localStorage.setItem(STORAGE_KEYS.playerEmoji, activePlayer.emoji || "");
+        updateWelcomeLine();
+        return;
+      }
+
+      clearActivePlayer();
+      showLobbyScreen();
+    }
+
+    async function loadPlayers() {
+      setStatus(playerSelectStatus, "Spelers laden...");
+      setStatus(scoreStatus, "Scorebord laden...");
+
+      const { data, error } = await supabase
+        .from("players")
+        .select("*")
+        .order("score", { ascending: false })
+        .order("name", { ascending: true });
+
+      if (error) {
+        setStatus(playerSelectStatus, "Kan spelers niet laden.", "error");
+        setStatus(scoreStatus, "Kan scorebord niet laden.", "error");
+        playerSelectList.innerHTML = "";
+        scoreboardList.innerHTML = "";
+        return;
+      }
+
+      setStatus(playerSelectStatus, "");
+      setStatus(scoreStatus, "");
+      renderPlayerSelect(data);
+      renderScoreboard(data);
+      syncActivePlayer(data);
+    }
+
+    function setActivePlayer(player) {
+      activePlayer = player;
+      localStorage.setItem(STORAGE_KEYS.playerId, player.id);
+      localStorage.setItem(STORAGE_KEYS.playerName, player.name || "");
+      localStorage.setItem(STORAGE_KEYS.playerEmoji, player.emoji || "");
+      selectedLevel = loadPlayerLevel(player.id);
+      renderLevelPicker();
+      updateWelcomeLine();
+    }
+
+    function clearActivePlayer() {
+      activePlayer = null;
+      activeChallenge = null;
+      localStorage.removeItem(STORAGE_KEYS.playerId);
+      localStorage.removeItem(STORAGE_KEYS.playerName);
+      localStorage.removeItem(STORAGE_KEYS.playerEmoji);
+      selectedLevel = LEVELS[0].id;
+      renderLevelPicker();
+      updateWelcomeLine();
+    }
+
+    async function selectPlayerById(playerId) {
+      if (!playerId) {
+        setStatus(playerSelectStatus, "Kies een speler uit de lijst.", "error");
+        return;
+      }
+
+      setStatus(playerSelectStatus, "Speler laden...");
+      const { data, error } = await supabase
+        .from("players")
+        .select("*")
+        .eq("id", playerId)
+        .maybeSingle();
+
+      if (error || !data) {
+        setStatus(playerSelectStatus, "Speler niet gevonden.", "error");
+        return;
+      }
+
+      setActivePlayer(data);
+      setStatus(playerSelectStatus, "");
+      showMainScreen();
+    }
+
+    function getChallengeStorageKey(playerId, levelId) {
+      if (!playerId || !levelId) {
+        return null;
+      }
+      return `barspel_challenge_${playerId}_${levelId}`;
+    }
+
+    function getLocalChallenge(playerId, levelId) {
+      const key = getChallengeStorageKey(playerId, levelId);
+      if (!key) {
+        return null;
+      }
+      const raw = localStorage.getItem(key);
+      if (!raw) {
+        return null;
+      }
+
+      try {
+        return JSON.parse(raw);
+      } catch {
+        return null;
+      }
+    }
+
+    function setLocalChallenge(playerId, levelId, challenge) {
+      const key = getChallengeStorageKey(playerId, levelId);
+      if (!key || !challenge) {
+        return;
+      }
+
+      localStorage.setItem(
+        key,
+        JSON.stringify({ id: challenge.id, label: challenge.label, level: challenge.level })
+      );
+    }
+
+    function getLocalUsedIds(playerId) {
+      const raw = localStorage.getItem(`${STORAGE_KEYS.usedPrefix}${playerId}`);
+      if (!raw) {
+        return new Set();
+      }
+
+      try {
+        const parsed = JSON.parse(raw);
+        return new Set(parsed.map((value) => String(value)));
+      } catch {
+        return new Set();
+      }
+    }
+
+    function setLocalUsedIds(playerId, ids) {
+      localStorage.setItem(`${STORAGE_KEYS.usedPrefix}${playerId}`, JSON.stringify(Array.from(ids)));
+    }
+
+    function isMissingColumn(error, columnName = "") {
+      if (!error) {
+        return false;
+      }
+
+      const message = String(error.message || "");
+      if (error.code === "42703") {
+        return true;
+      }
+
+      return columnName ? message.includes(columnName) : false;
+    }
+
+    function isMissingTable(error) {
+      if (!error) {
+        return false;
+      }
+
+      const message = String(error.message || "");
+      return error.code === "42P01" || message.includes("does not exist");
+    }
+
+    async function loadUsedChallengeIds(playerId) {
+      if (!playerId) {
+        return new Set();
+      }
+
+      const localIds = getLocalUsedIds(playerId);
+
+      if (historyTableAvailable === false) {
+        return localIds;
+      }
+
+      if (historyCache.has(playerId)) {
+        const cached = new Set(historyCache.get(playerId));
+        localIds.forEach((id) => cached.add(id));
+        return cached;
+      }
+
+      const { data, error } = await supabase
+        .from("player_challenge_history")
+        .select("challenge_id")
+        .eq("player_id", playerId);
+
+      if (error) {
+        if (isMissingTable(error) || error.code === "42501") {
+          historyTableAvailable = false;
+        }
+        return localIds;
+      }
+
+      const ids = new Set((data || []).map((row) => String(row.challenge_id)));
+      localIds.forEach((id) => ids.add(id));
+      historyCache.set(playerId, ids);
+      return new Set(ids);
+    }
+
+    async function recordChallengeCompletion(challenge) {
+      if (!activePlayer || !challenge) {
+        return;
+      }
+
+      const localIds = getLocalUsedIds(activePlayer.id);
+      localIds.add(String(challenge.id));
+      setLocalUsedIds(activePlayer.id, localIds);
+
+      if (historyTableAvailable === false) {
+        return;
+      }
+
+      const { error } = await supabase
+        .from("player_challenge_history")
+        .insert({
+          player_id: activePlayer.id,
+          challenge_id: challenge.id
+        });
+
+      if (error) {
+        if (isMissingTable(error) || error.code === "42501") {
+          historyTableAvailable = false;
+        }
+        if (error.code === "23505") {
+          return;
+        }
+        return;
+      }
+
+      const cached = historyCache.get(activePlayer.id) || new Set();
+      cached.add(String(challenge.id));
+      historyCache.set(activePlayer.id, cached);
+    }
+
+    function normalizeLevel(value) {
+      return String(value || "").toLowerCase().trim();
+    }
+
+    function detectChallengeTextField(challenges) {
+      const candidates = ["text", "title", "description", "name", "prompt"];
+      for (const key of candidates) {
+        if (challenges.some((challenge) => typeof challenge[key] === "string" && challenge[key].trim())) {
+          return key;
+        }
+      }
+      return "text";
+    }
+
+    function pickChallengeLabel(challenge) {
+      if (!challenge) {
+        return "";
+      }
+
+      const keys = ["text", "title", "description", "name", "prompt"];
+      for (const key of keys) {
+        const value = challenge[key];
+        if (typeof value === "string" && value.trim()) {
+          return value.trim();
+        }
+      }
+
+      return "";
+    }
+
+    function filterChallengesByLevel(challenges, levelId) {
+      const normalized = normalizeLevel(levelId);
+      if (!normalized) {
+        return challenges;
+      }
+
+      const hasLevel = challenges.some((challenge) => normalizeLevel(challenge.level));
+      if (!hasLevel) {
+        return challenges;
+      }
+
+      return challenges.filter((challenge) => normalizeLevel(challenge.level) === normalized);
+    }
+
+    async function loadChallenges() {
+      if (challengesCache) {
+        return { data: challengesCache };
+      }
+
+      const { data, error } = await supabase
+        .from("challenges")
+        .select("*");
+
+      if (error) {
+        return { error, data: [] };
+      }
+
+      challengesCache = data || [];
+      challengeTextField = detectChallengeTextField(challengesCache);
+      return { data: challengesCache };
+    }
+
+    async function loadChallengeById(challengeId) {
+      if (!challengeId) {
+        return null;
+      }
+
+      const { data, error } = await supabase
+        .from("challenges")
+        .select("*")
+        .eq("id", challengeId)
+        .maybeSingle();
+
+      if (error) {
+        return null;
+      }
+
+      return data;
+    }
+
+    function setChallengeDisplay(text) {
+      challengeEl.textContent = text || "Nog geen opdracht actief.";
+    }
+
+    async function persistPlayerChallenge(challenge) {
+      if (!activePlayer) {
+        return { ok: false };
+      }
+
+      const levelKey = normalizeLevel(challenge.level) || selectedLevel;
+      const { data, error } = await supabase
+        .from("players")
+        .update({ current_challenge_id: challenge.id })
+        .eq("id", activePlayer.id)
+        .select("*")
+        .maybeSingle();
+
+      if (error) {
+        setLocalChallenge(activePlayer.id, levelKey, challenge);
+        return { ok: false, error };
+      }
+
+      if (data) {
+        activePlayer = data;
+        updateWelcomeLine();
+      }
+
+      setLocalChallenge(activePlayer.id, levelKey, challenge);
+      return { ok: true };
+    }
+
+    async function ensureActiveChallenge() {
+      if (!activePlayer) {
+        setChallengeDisplay("Kies eerst een speler.");
+        return;
+      }
+
+      setStatus(challengeStatus, "Opdracht laden...");
+
+      const storedLocal = getLocalChallenge(activePlayer.id, selectedLevel);
+      let storedId = storedLocal ? storedLocal.id : null;
+      if (!storedId && activePlayer.current_challenge_id) {
+        storedId = activePlayer.current_challenge_id;
+      }
+
+      if (storedId) {
+        const challenge = await loadChallengeById(storedId);
+        if (challenge) {
+          const label = pickChallengeLabel(challenge);
+          const desiredLevel = normalizeLevel(selectedLevel);
+          const challengeLevel = normalizeLevel(challenge.level);
+          const levelOk = !desiredLevel || !challengeLevel || desiredLevel === challengeLevel;
+
+          if (levelOk) {
+            const resolvedLevel = challengeLevel || normalizeLevel(selectedLevel);
+            activeChallenge = { id: challenge.id, label: label || "Nieuwe opdracht", level: resolvedLevel };
+            setChallengeDisplay(activeChallenge.label);
+            setStatus(challengeStatus, "");
+            setLocalChallenge(activePlayer.id, selectedLevel, activeChallenge);
+            return;
+          }
+        }
+      }
+
+      if (storedLocal && storedLocal.label) {
+        activeChallenge = {
+          id: storedLocal.id,
+          label: storedLocal.label,
+          level: normalizeLevel(storedLocal.level) || normalizeLevel(selectedLevel)
+        };
+        setChallengeDisplay(activeChallenge.label);
+        setStatus(challengeStatus, "");
+        return;
+      }
+
+      await assignNewChallenge(activeChallenge ? activeChallenge.id : null);
+    }
+
+    async function assignNewChallenge(excludeId = null) {
+      if (!activePlayer) {
+        setChallengeDisplay("Kies eerst een speler.");
+        return false;
+      }
+
+      setStatus(challengeStatus, "Nieuwe opdracht zoeken...");
+
+      const { data: challenges, error } = await loadChallenges();
+      if (error) {
+        setStatus(challengeStatus, "Kan opdrachten niet laden.", "error");
+        return false;
+      }
+
+      if (!challenges.length) {
+        setChallengeDisplay("Nog geen opdrachten in de database.");
+        setStatus(challengeStatus, "Voeg opdrachten toe in Supabase.", "error");
+        return false;
+      }
+
+      const pool = filterChallengesByLevel(challenges, selectedLevel);
+      if (!pool.length) {
+        setChallengeDisplay("Geen opdrachten voor dit level.");
+        setStatus(challengeStatus, "Kies een ander level of voeg opdrachten toe.", "error");
+        return false;
+      }
+
+      const usedIds = await loadUsedChallengeIds(activePlayer.id);
+      let candidates = pool.filter((challenge) => !usedIds.has(String(challenge.id)));
+
+      if (excludeId) {
+        candidates = candidates.filter((challenge) => String(challenge.id) !== String(excludeId));
+      }
+
+      let reused = false;
+      if (!candidates.length) {
+        if (historyTableAvailable === false) {
+          const localIds = getLocalUsedIds(activePlayer.id);
+          pool.forEach((challenge) => {
+            localIds.delete(String(challenge.id));
+          });
+          setLocalUsedIds(activePlayer.id, localIds);
+        }
+        candidates = pool.filter((challenge) => !excludeId || String(challenge.id) !== String(excludeId));
+        reused = true;
+      }
+
+      if (!candidates.length && excludeId) {
+        candidates = pool;
+      }
+
+      if (!candidates.length) {
+        setChallengeDisplay("Nog geen opdrachten in de database.");
+        setStatus(challengeStatus, "Voeg opdrachten toe in Supabase.", "error");
+        return false;
+      }
+
+      const pick = candidates[Math.floor(Math.random() * candidates.length)];
+      const label = pickChallengeLabel(pick);
+      const resolvedLevel = normalizeLevel(pick.level) || normalizeLevel(selectedLevel);
+      activeChallenge = { id: pick.id, label: label || "Nieuwe opdracht", level: resolvedLevel };
+      setChallengeDisplay(activeChallenge.label);
+
+      const result = await persistPlayerChallenge(activeChallenge);
+      if (result.error) {
+        if (isMissingColumn(result.error, "current_challenge_id")) {
+          setStatus(challengeStatus, "Opdracht wordt op dit apparaat bijgehouden.", "success");
+          return true;
+        }
+
+        setStatus(challengeStatus, "Opdracht kon niet worden opgeslagen.", "error");
+        return false;
+      }
+
+      if (reused) {
+        setStatus(challengeStatus, "Alle opdrachten van dit level zijn gedaan. We beginnen opnieuw.", "success");
+      } else {
+        setStatus(challengeStatus, "");
+      }
+      return true;
+    }
+
+    function setActionButtonsDisabled(disabled) {
+      approveBtn.disabled = disabled;
+    }
+
+    function requestAdminPin() {
+      pinInput.value = "";
+      setStatus(pinStatus, "");
+      pinModal.hidden = false;
+      pinInput.focus();
+
+      return new Promise((resolve) => {
+        pinResolver = resolve;
+      });
+    }
+
+    function closePinModal(result) {
+      pinModal.hidden = true;
+      if (pinResolver) {
+        pinResolver(result);
+        pinResolver = null;
+      }
+    }
+
+    function confirmPin() {
+      const value = pinInput.value.trim();
+      if (value === ADMIN_PIN) {
+        closePinModal(true);
+        return;
+      }
+
+      setStatus(pinStatus, "Onjuiste pincode.", "error");
+      pinInput.select();
+    }
+
+    pinConfirmBtn.addEventListener("click", confirmPin);
+    pinCancelBtn.addEventListener("click", () => closePinModal(false));
+    pinInput.addEventListener("keydown", (event) => {
+      if (event.key === "Enter") {
+        confirmPin();
+      }
+      if (event.key === "Escape") {
+        closePinModal(false);
+      }
+    });
+    pinModal.addEventListener("click", (event) => {
+      if (event.target === pinModal) {
+        closePinModal(false);
+      }
+    });
+
+    async function approveChallenge() {
+      if (!activePlayer) {
+        setStatus(challengeActionStatus, "Kies eerst een speler.", "error");
+        return;
+      }
+
+      const approved = await requestAdminPin();
+      if (!approved) {
+        setStatus(challengeActionStatus, "Admin pincode vereist.", "error");
+        return;
+      }
+
+      if (!activeChallenge) {
+        const ok = await assignNewChallenge();
+        if (!ok) {
+          setStatus(challengeActionStatus, "Geen opdracht beschikbaar.", "error");
+        }
+        return;
+      }
+
+      setStatus(challengeActionStatus, "Punt toevoegen...");
+      setActionButtonsDisabled(true);
+
+      const nextScore = (Number(activePlayer.score) || 0) + 1;
+      const { data, error } = await supabase
+        .from("players")
+        .update({ score: nextScore })
+        .eq("id", activePlayer.id)
+        .select("*")
+        .maybeSingle();
+
+      if (error) {
+        setStatus(challengeActionStatus, "Score bijwerken mislukt.", "error");
+        setActionButtonsDisabled(false);
+        return;
+      }
+
+      activePlayer = data || { ...activePlayer, score: nextScore };
+      updateWelcomeLine();
+      await recordChallengeCompletion(activeChallenge);
+      await assignNewChallenge(activeChallenge ? activeChallenge.id : null);
+      setStatus(challengeActionStatus, "Top! Punt erbij.", "success");
+      setActionButtonsDisabled(false);
+    }
+
+    function refreshData() {
+      loadPlayers().then(() => {
+        if (activePlayer) {
+          ensureActiveChallenge();
+        }
+      });
+    }
+
+    function subscribeToRealtime() {
+      if (realtimeChannel) {
+        return;
+      }
+
+      realtimeChannel = supabase.channel("barspel-live");
+      realtimeChannel
+        .on("postgres_changes", { event: "*", schema: "public", table: "players" }, () => {
+          loadPlayers();
+        })
+        .on("postgres_changes", { event: "*", schema: "public", table: "challenges" }, () => {
+          challengesCache = null;
+          if (activePlayer) {
+            ensureActiveChallenge();
+          }
+        })
+        .subscribe();
+    }
+
+    async function joinGame() {
+      const name = nameInput.value.trim();
+      if (!name) {
+        setStatus(joinStatus, "Vul eerst je naam in.", "error");
+        nameInput.focus();
+        return;
+      }
+
+      joinButton.disabled = true;
+      setStatus(joinStatus, "Bezig met aanmelden...");
+
+      const { data, error } = await supabase
+        .from("players")
+        .insert({
+          name,
+          emoji: selectedEmoji,
+          score: 0
+        })
+        .select("*")
+        .single();
+
+      if (error) {
+        setStatus(joinStatus, `Er ging iets mis: ${error.message}`, "error");
+        joinButton.disabled = false;
+        return;
+      }
+
+      setActivePlayer(data);
+      nameInput.value = "";
+      setStatus(joinStatus, `Welkom ${data.name}!`, "success");
+      joinButton.disabled = false;
+      showMainScreen();
+    }
+
+    async function addChallenge() {
+      if (!adminUnlocked) {
+        setStatus(adminStatus, "Ontgrendel het adminpaneel eerst.", "error");
+        return;
+      }
+
+      const text = challengeTextInput.value.trim();
+      if (!text) {
+        setStatus(adminStatus, "Vul een opdracht in.", "error");
+        return;
+      }
+
+      addChallengeBtn.disabled = true;
+      setStatus(adminStatus, "Opdracht toevoegen...");
+
+      const payload = { [challengeTextField]: text, level: challengeLevelSelect.value };
+      let { data, error } = await supabase
+        .from("challenges")
+        .insert(payload)
+        .select("*")
+        .single();
+
+      if (error && isMissingColumn(error, "level")) {
+        const fallback = await supabase
+          .from("challenges")
+          .insert({ [challengeTextField]: text })
+          .select("*")
+          .single();
+        data = fallback.data;
+        error = fallback.error;
+      }
+
+      if (error) {
+        setStatus(adminStatus, `Toevoegen mislukt: ${error.message}`, "error");
+        addChallengeBtn.disabled = false;
+        return;
+      }
+
+      challengeTextInput.value = "";
+      challengesCache = null;
+      setStatus(adminStatus, "Opdracht toegevoegd.", "success");
+      addChallengeBtn.disabled = false;
+    }
+
+    joinButton.addEventListener("click", joinGame);
+    nameInput.addEventListener("keydown", (event) => {
+      if (event.key === "Enter") {
+        joinGame();
+      }
+    });
+
+    switchPlayerBtn.addEventListener("click", () => {
+      clearActivePlayer();
+      showLobbyScreen();
+      loadPlayers();
+    });
+
+    approveBtn.addEventListener("click", approveChallenge);
+    addChallengeBtn.addEventListener("click", addChallenge);
+
+    unlockAdminBtn.addEventListener("click", async () => {
+      const approved = await requestAdminPin();
+      if (!approved) {
+        setStatus(adminStatus, "Onjuiste pincode.", "error");
+        return;
+      }
+
+      adminUnlocked = true;
+      adminForm.hidden = false;
+      unlockAdminBtn.hidden = true;
+      lockAdminBtn.hidden = false;
+      setStatus(adminStatus, "Adminpaneel ontgrendeld.", "success");
+    });
+
+    lockAdminBtn.addEventListener("click", () => {
+      adminUnlocked = false;
+      adminForm.hidden = true;
+      unlockAdminBtn.hidden = false;
+      lockAdminBtn.hidden = true;
+      setStatus(adminStatus, "Adminpaneel vergrendeld.", "");
+    });
+
+    async function init() {
+      renderEmojiButtons();
+      renderLevelPicker();
+      showLobbyScreen();
+      await loadPlayers();
+
+      const storedPlayerId = localStorage.getItem(STORAGE_KEYS.playerId);
+      if (storedPlayerId) {
+        await selectPlayerById(storedPlayerId);
+      }
+    }
+
+    init();
   </script>
 </body>
 </html>
